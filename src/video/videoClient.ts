@@ -83,17 +83,17 @@ async function createTopicandQueue(){
       const topicResponse = await snsClient.send(new awsSNS.CreateTopicCommand(snsTopicParams));
 
       const topicArn = String(topicResponse.TopicArn)
-      //console.log("Success", topicResponse);
+      
       // Create SQS Queue
       const sqsResponse = await sqsClient.send(new awsSQS.CreateQueueCommand(sqsParams));
-      //console.log("Success", sqsResponse);
+
       const sqsQueueCommand = await sqsClient.send(new awsSQS.GetQueueUrlCommand({QueueName: sqsQueueName}))
       const sqsQueueUrl = sqsQueueCommand.QueueUrl
       const attribsResponse = await sqsClient.send(new awsSQS.GetQueueAttributesCommand({QueueUrl: sqsQueueUrl, AttributeNames: ['QueueArn']}))
       const attribs = attribsResponse.Attributes
-      //console.log(attribs)
+      
       const queueArn = attribs.QueueArn
-      // subscribe SQS queue to SNS topic
+      
       const subscribed = await snsClient.send(new awsSNS.SubscribeCommand({TopicArn: topicArn, Protocol:'sqs', Endpoint: queueArn}))
       const policy = {
         Version: "2012-10-17",
@@ -115,8 +115,7 @@ async function createTopicandQueue(){
 
       const response = await sqsClient.send(new awsSQS.SetQueueAttributesCommand({QueueUrl: sqsQueueUrl, Attributes: {Policy: JSON.stringify(policy)}}))
 
-      //console.log(response)
-      //console.log(sqsQueueUrl, topicArn)
+
       return String(sqsQueueUrl) + "$" + topicArn;
 
     } catch (err) {
@@ -173,14 +172,12 @@ async function getLabelDetectionResults(startJobId: string) {
             console.log("Confidence: " + String(instance.Confidence) + "Bounding Box:\nTop: " + String(instance.BoundingBox.Top) + "\nLeft: " + String(instance.BoundingBox.Left) + "\nWidth: " + String(instance.BoundingBox.Width) + "\nHeight: " + String(instance.BoundingBox.Height))
 
           })
-        //console.log()
         // Log parent if found
         console.log("   Parents:")
         label.Parents.forEach(parent =>{
 
           console.log(`    ${parent.Name}`)
         })
-        //console.log()
         // Searh for pagination token, if found, set variable to next token
         if (String(response).includes("NextToken")){
           paginationToken = response.NextToken
@@ -262,16 +259,6 @@ async function runLabelDetectionAndGetResults(bucketWithVideo:string = "video-cr
 
         const sqsAndTopic  = createTopicandQueue()
         const startLabelDetectionRes = startLabelDetection(roleArn, (await sqsAndTopic).split('$')[1], bucketWithVideo, nameOfVideoToAnalyze)
-      /*const sqsAndTopic  = new Promise ((resolve, reject) => {
-        resolve(createTopicandQueue())
-      })
-      sqsAndTopic.then(
-        (value) => {
-            const startLabelDetectionRes = new Promise ((resolve, reject) => {
-                resolve(startLabelDetection(roleArn, value[1]) )
-            });
-
-        } )*/
 
       const getSQSMessageStatus = await getSQSMessageSuccess((await sqsAndTopic).split('$')[0], await startLabelDetectionRes)
       console.log(getSQSMessageSuccess)
