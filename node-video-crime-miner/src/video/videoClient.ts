@@ -75,6 +75,9 @@ const sqsParams = {
     },
   };
 
+/* Function Name: createTopicandQueue()
+// Description:
+*/
 async function createTopicandQueue(){
 
     try {
@@ -126,6 +129,10 @@ async function createTopicandQueue(){
     }
 };
 
+/* Function Name: startLabelDetection()
+// Parameters:
+// Description:
+*/
 async function startLabelDetection (roleArn: string, snsTopicArn:string, bucketWithVideo:string, nameOfVideoToAnalyze:string) {
     try {
       //Initiate label detection and update value of startJobId with returned Job ID
@@ -140,6 +147,10 @@ async function startLabelDetection (roleArn: string, snsTopicArn:string, bucketW
     }
   };
 
+/* Function Name: getLabelDetectionResults()
+// Parameters:
+// Description:
+*/
 async function getLabelDetectionResults(startJobId: string) {
 
     console.log("Retrieving Label Detection results")
@@ -161,12 +172,7 @@ async function getLabelDetectionResults(startJobId: string) {
         // For every detected label, log label, confidence, bounding box, and timestamp
         response.Labels.forEach(function(labelDetection: LabelResponse) {
 
-
           var label = labelDetection.Label
-
-
-
-
 
           console.log(`Timestamp: ${labelDetection.Timestamp}\nLabel: ${label.Name}\nConfidence: ${label.Confidence}` + "\nInstances:")
           label.Instances.forEach(function (instance: InstanceContent){
@@ -194,7 +200,10 @@ async function getLabelDetectionResults(startJobId: string) {
     }
 }
 
-// Checks for status of job completion
+/* Function Name: getSQSMessageSuccess()
+// Parameters:
+// Description: Checks for status of job completion
+*/
 async function getSQSMessageSuccess (sqsQueueUrl:string, startJobId:string) {
     try {
       // Set job found and success status to false initially
@@ -254,9 +263,11 @@ async function getSQSMessageSuccess (sqsQueueUrl:string, startJobId:string) {
     }
   }
 
-
-  // Start label detection job, sent status notification, check for success status
+/* Function Name:
+// Parameters:
+// Description: Start label detection job, sent status notification, check for success status
 // Retrieve results if status is "SUCEEDED", delete notification queue and topic
+*/
 async function runLabelDetectionAndGetResults(bucketWithVideo:string = "video-crime-miner-video-test-bucket", nameOfVideoToAnalyze:string = "Crowded People Walking Down Oxford Street London 4K UHD Stock Video Footage-ng8Wivt52K0.mp4") {
     try {
 

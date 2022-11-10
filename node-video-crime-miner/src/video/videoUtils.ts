@@ -17,6 +17,10 @@ var attributes = {
 }
 const client  = new RekognitionClient(attributes)
 
+/* Function Name: startVideoFacesDetection()
+// Parameters:
+// Description:
+*/
 async function startVideoFacesDetection(bucketName:string, videoName:string){
     try {
         var attributes = {
@@ -39,7 +43,10 @@ async function startVideoFacesDetection(bucketName:string, videoName:string){
 	}
 }
 
-// Gets the output based on jobId for face recognition
+/* Function Name: getVideoFacesDetectionOutput()
+// Parameters:
+// Description: Gets the output based on jobId for face recognition
+*/
 async function getVideoFacesDetectionOutput(id:string){
     try {
         const parameters = {
