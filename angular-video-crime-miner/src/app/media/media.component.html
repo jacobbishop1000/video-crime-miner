@@ -1,1 +1,5 @@
-<p>media works!</p>
+<vg-player>
+    <video [vgMedia]="$any(media)" #media id="singleVideo" preload="auto" controls>
+        <source src="https://mt-vcm-uploads.s3.amazonaws.com/Test+Video+CLI.mp4" type="video/mp4">
+    </video>
+</vg-player>
