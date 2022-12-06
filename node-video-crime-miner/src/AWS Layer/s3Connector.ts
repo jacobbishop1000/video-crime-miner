@@ -1,17 +1,17 @@
 
 import * as fs  from 'fs'
 import * as path from 'path'
-import {S3Client, CreateBucketCommand, ListBucketsCommand, ListObjectsV2Command, PutObjectCommand} from '@aws-sdk/client-s3'
+import {S3Client, CreateBucketCommand, ListBucketsCommand, ListObjectsV2Command, PutObjectCommand, GetObjectCommand} from '@aws-sdk/client-s3'
 
-const region = process.env['REGION'] || "REGION NOT DEFINED IN .ENV"
-const accessKeyId = process.env["AWS_ACCESS_KEY_ID"] || "AWS ACCESS KEY NOT DEFINED IN .ENV"
-const secretAccessKey = process.env["AWS_SECRET_ACCESS_KEY"] || "AWS SECRET ACCESS KEY REGION NOT DEFINED IN .ENV"
+const AWS_BUCKET_REGION= process.env['REGION'] || "REGION NOT DEFINED IN .ENV"
+const AWS_ACCESS_KEY_ID = process.env["AWS_ACCESS_KEY_ID"] || "AWS ACCESS KEY NOT DEFINED IN .ENV"
+const AWS_SECRET_ACCESS_KEY = process.env["AWS_SECRET_ACCESS_KEY"] || "AWS SECRET ACCESS KEY REGION NOT DEFINED IN .ENV"
 
 const attributes = {
-    region : region,
+    region : AWS_BUCKET_REGION,
     credentials:{
-        accessKeyId : accessKeyId,
-        secretAccessKey : secretAccessKey
+        accessKeyId : AWS_ACCESS_KEY_ID,
+        secretAccessKey : AWS_SECRET_ACCESS_KEY
     }
 }
 //console.log("S3CONNECTOR ENV VAR ATTRIBUTES")
@@ -88,9 +88,28 @@ async function listObjects(bucket:string) {
 	
  }
 
+ async function download(bucketName:any, file:any) {
+	try {
+		var attributes = {
+			Bucket: bucketName,
+			Key : file
+		}
+
+		const command = new GetObjectCommand(attributes)
+		var result = await client.send(command)
+		return result.Body?.transformToString() || {error: "Could not retrieve file from: " + bucketName}
+		
+	} catch (e) {
+		console.log('error' , e)
+		return {error: e}
+	}
+
+ }
+
 // Testing code
 //listObjects("video-crime-miner-video-test-bucket") // an example
 //listBuckets() //another example
+//download("mt-vcm-uploads" , "testVideo.mp4")
 // If you're getting 403 errors on these two lines ^^^ then contact Jacob Bishop on Slack to get AWS ACL access
 
-export { createBucket, listBuckets, listObjects, upload }
+export { createBucket, listBuckets, listObjects, upload, download }
