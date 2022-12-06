@@ -2,7 +2,7 @@ import * as envConfig from './envConfig.js' //very first thing we do is intializ
 envConfig.default //load in global .env variables
 
 import express, { Express, Request, Response } from 'express'
-import { upload, listObjects } from './src/AWS Layer/s3Connector.js'
+import { upload, listObjects, download } from './src/AWS Layer/s3Connector.js'
 import multer, {FileFilterCallback} from 'multer'
 
 const app: Express = express()
@@ -44,7 +44,7 @@ app.post('/upload', (req: Request, res: Response) => {
 })
 
 app.get('/files', async (req: Request, res: Response) => {
-  const files = await listObjects("video-crime-miner-video-test-bucket")
+  const files = await listObjects("mt-vcm-uploads")
   try {
     return res.status(200).json(
       files
@@ -52,6 +52,17 @@ app.get('/files', async (req: Request, res: Response) => {
   } catch (err) {
     res.status(500).send(err)
   }
+})
+
+app.get('/download/:filename' , async (req:Request , res: Response) => {
+	const filename = await download("mt-vcm-uploads" , "testVideo.mp4")
+	try {
+		return res.status(200).json(
+			filename
+		)
+	} catch (err) {
+		res.status(500).send(err)
+	}
 })
 
 const NODE_PORT = process.env['NODE_PORT'] || "8000"
